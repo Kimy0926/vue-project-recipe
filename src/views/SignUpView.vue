@@ -22,11 +22,11 @@ const handleSignIn = async () => {
   };
 
   try {
-    const response = await axios.post(`${apiBaseUrl}/login`, newUser);
+    const response = await axios.post(`${apiBaseUrl}/login/signup`, newUser);
     toast.success('Sign Up Succeeded');
     router.push('/');
   } catch (error) {
-    toast.error('Sign Up Failed');
+    toast.error(error.response.data);
   }
 };
 
@@ -48,7 +48,7 @@ const handleSignIn = async () => {
               name="userName"
               class="border rounded w-full py-2 px-3"
               placeholder="Enter your name"
-              required
+              required autocomplete="userName"
             />
           </div>
 
@@ -61,7 +61,7 @@ const handleSignIn = async () => {
               name="email"
               class="border rounded w-full py-2 px-3"
               placeholder="Enter your email"
-              required
+              required autocomplete="email"
             />
           </div>
 
@@ -74,12 +74,9 @@ const handleSignIn = async () => {
               name="passwordHash"
               class="border rounded w-full py-2 px-3"
               placeholder="Enter your password"
-              required
+              required autocomplete="passwordHash"
             />
           </div>
-
-
-          <div class="mb-4 text-center text-red-500" v-if="error">{{ error }}</div>
 
           <div>
             <button

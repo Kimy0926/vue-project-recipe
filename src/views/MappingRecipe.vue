@@ -80,11 +80,11 @@ const mapEquipmentToRecipe = async () => {
     const mappingObj = selectedEquipmentIds.value.map((equipmentId) => ({
     RecipeId: selectedRecipe.value.recipeId,
     EquipmentId: equipmentId,
-    SiteId: state.equipment[equipmentId].siteId, 
+    SiteId: selectedSite.value, 
   }));
 
     try {
-        await axios.post(`${apiBaseUrl}/equipment-recipe-map`, mappingObj);
+        await axios.post(`${apiBaseUrl}/recipes/mapping`, mappingObj);
         toast.success('Mapping Updated Successfully');
         fetchCurrentMappings(selectedRecipe.value.recipeId)
     } catch (error) {
@@ -104,6 +104,17 @@ onMounted(async () => {
         state.equipment = equipmentResponse.data;
         state.recipes = recipeResponse.data;
         state.site =siteResponse.data;
+
+        // Set selectedSite to the first site in state.site
+        if (state.site.length > 0) {
+          selectedSite.value = state.site[0];
+        }
+        
+        // Get the first recipe filtered by siteId
+        selectedRecipe.value = Object.entries(state.recipes)
+          .filter(([key, value]) => value.siteId === selectedSite.value)
+          .map(([key, value]) => value)[0] || null;
+
     } catch (error) {
         console.error('Error while fetching data', error);
     } finally {
@@ -131,7 +142,6 @@ onMounted(async () => {
           <!-- Recipe Selection -->
           <label for="recipe-select" class="block text-gray-700 font-medium mb-2">Recipe:</label>
           <select id="recipe-select" v-model="selectedRecipe" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option :value="null">Select a Recipe</option>
             <option v-for="recipe in filterdRecipe" :value="recipe" :key="recipe.recipeId">
               {{ recipe.recipeName }}
             </option>
@@ -161,7 +171,7 @@ onMounted(async () => {
           class="bg-green-600 text-white px-4 py-2 rounded-lg mt-6 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
           :disabled="!selectedRecipe || selectedEquipmentIds.length === 0"
         >
-          Map Selected Equipment to Recipe
+          Map Selected Equipment
         </button>
       </div>
 
